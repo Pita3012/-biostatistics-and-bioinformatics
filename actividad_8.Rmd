@@ -1,0 +1,594 @@
+---
+title: "SEMANA 21-ACTIVIDAD 08"
+author: "Sanchez Collao Javiera Andrea"
+date: "`r Sys.Date()`"
+output: 
+  prettydoc::html_pretty:
+    toc: yes
+    theme: hpstr
+    highlight: github
+    math: katex
+---
+
+```{r setup, echo = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, comment = NA)
+
+```
+
+------------------------------------------------------------------------
+
+[**Antes de comenzar a resolver las Preguntas, vamos a cargar las librerias en R**]{style="color:purple"}
+
+```{r}
+library(tidyverse)
+library(psych)
+library(kableExtra)
+library(ggplot2)
+library(plotly)
+library(readxl)
+library(RColorBrewer)
+
+```
+
+# [**Pruebas No Paramétricas**]{style="color:purple"} 
+
+**Definición:**
+
+Las pruebas no paramétricas son técnicas estadísticas que no asumen una distribución específica para los datos. Son útiles cuando los datos no siguen una distribución normal o cuando las muestras son pequeñas.
+
+**Características:**
+
+  - No asumen Distribución: No requieren que los datos sigan una distribución específica (por ejemplo, normalidad).
+  - Basadas en Rangos: Muchas pruebas no paramétricas se basan en rangos en lugar de valores brutos.
+  - Flexibles: Pueden utilizarse con datos ordinales, intervalos o de razón.
+  
+
+Algunas pruebas no paramétricas:
+
+**Comparación entre 2 grupos:**
+
+ - Prueba U de Mann.Whitney: Compara dos muestras independientes.
+ - Prueba de Wilcoxon para muestras pareadas: Compara dos muestras relacionadas.
+
+**Comparación entre más de 2 grupos:**
+
+ - Prueba de Kruskal-Wallis: Compara más de dos grupos independientes.
+ - Prueba de Friedman: Compara más de dos grupos relacionados.
+
+## [**Prueba U de Mann-Whitney**]{style="color:purple"} 
+
+**Concepto:**
+
+La Prueba U de Mann-Whitney, también conocida como la prueba de suma de rangos de Wilcoxon, es una alternativa a la prueba t de Student para muestras independientes cuando no se cumplen los supuestos de normalidad. Esta prueba compara las medianas de dos grupos para determinar si hay diferencias significativas entre ellos.
+
+**Cómo funciona:**
+
+ - **Combinar y Ordenar las Observaciones:** Primero, se combinan todos los datos de ambos grupos y se ordenan de menor a mayor. A cada observación se le asigna un rango, siendo 1 el rango para la observación más pequeña.
+ - **Suma de Rangos:** Luego, se suman los rangos para las observaciones de cada grupo por separado.
+ - **Calcular la Estadística U:** La estadística U se calcula para cada grupo. La U de un grupo es el número total de comparaciones en las que una observación del grupo es mayor que una observación del otro grupo. Existen fórmulas para calcular U a partir de las sumas de rangos.
+ - **Comparar con Valor Crítico:** Finalmente, se compara el valor menor de las estadísticas U con un valor crítico obtenido de tablas de distribución, o se calcula un valor p utilizando aproximaciones normales si el tamaño de la muestra es lo suficientemente grande.
+ 
+**Cómo funciona:**
+
+ - **Si U es Menor o Igual al Valor Crítico** o **si el valor p es Menor que el Nivel de Significancia (usualmente 0.05):** Hay evidencia suficiente para rechazar la hipótesis nula de que las medianas de los dos grupos son iguales. Esto indica que hay una diferencia significativa entre los grupos.
+ - **Si No:** No se rechaza la hipótesis nula, lo que sugiere que no hay suficiente evidencia para decir que las medianas de los grupos son diferentes.
+ 
+**Supuestos**
+
+ - Las observaciones son independientes dentro y entre los grupos.
+ - Las observaciones son al menos ordinales.
+ - No se requiere que los datos sigan una distribución normal, lo que hace que la prueba sea útil para datos no normales o para tamaños de muestra pequeños.
+ 
+### [**Ejemplo en R**]{style="color:purple"}
+
+Para comparar el consumo de gasolina según el tipo de transmisión del coche en el conjhunto de datos `mtcars`, utilizaremos la Prueba U de Mann-Whitney. En este conjunto de datos, la transmisión del coche está representada por la variable `am`, donde 0 indica una transmisión automática y 1 una manual. La variable que representa el consumo de gasolina es `mpg` (millas por galón).
+
+Vamos a dividir los datos en dos grupos según el tipo de transmisión y luego aplicaremos la prueba U de Mann-Whytney para evaluar las hipótesis.
+
+**Hipótesis**
+
+ - Hipótesis Nula (H0): Los datos de consumo de gasolina para las transmisiones automáticas y manuales provienen de poblaciones idénticas.
+ - Hipótesis Alternativa (H1): Los datos de consumo de gasolina para las transmisiones automáticas y manuales no provienen de poblaciones idénticas.
+ 
+**Código en R**
+
+```{r}
+library(MASS)
+
+data(mtcars)
+
+data <- mtcars
+
+# Dividir los datos según el tipo de transmisión
+auto <- data[data$am == 0, "mpg"]
+manual <- data[data$am == 1, "mpg"]
+
+# Realizar Prueba U de Mann-Whitney
+resultado_mann_whitney <- wilcox.test(auto, manual)
+
+resultado_mann_whitney
+
+
+```
+El resultado de `wilcox.test` dará tanto la estadística de la prueba como el valor p. Si el valor p es menor que el nivel de significancia (usualmente 0.05), se podrá rechazar la hipóteiss nula en favor de la alternativa.
+
+```{r}
+p_value_thresh <- 0.05
+
+if(resultado_mann_whitney$p.value > p_value_thresh) {
+  cat("p-valor =", resultado_mann_whitney$p.value, "\n")
+  cat("No rechazamos H0")
+} else {
+  cat("p-valor =", resultado_mann_whitney$p.value, "\n")
+  cat("Rechazamos H0")
+}
+```
+
+```{r}
+# Crear el boxplot con ggplot2
+ggplot(mtcars, aes(x = as.factor(am), y = mpg)) +
+  geom_boxplot(fill = "purple") +
+  labs(x = "Tipo de Transmisión (0 = Automático, 1 = Manual)",
+       y = "Consumo de Gasolina (mpg)",
+       title = "Consumo de Gasolina según el Tipo de Transmisión") +
+  theme_minimal()
+```
+
+
+Como el p-valor es <5%, rechazamos la hipótesis nula y el gráfico nos indica que los coches con transmisión manual consumen más gasolina.
+
+
+***
+
+## [**Prueba de Wilcoxon para muestras relacionadas**]{style="color:purple"}
+
+**¿Cuándo se usa?**
+
+Esta prueba se utiliza cuando tienes dos conjuntos de medidas que están emparejadas de alguna manera.
+Algunos ejemplos comunes incluyen:
+
+  - Mediciones antes y después de un tratamiento en los mimsmos sujetos.
+  - Mediciones en pares de sujetos que están emparejados de alguna manera (por ejemplo, gemelos).
+  
+**Supuestos de la Prueba**
+
+  - Las muestras deben ser emparejadas o relacionadas.
+  - Las diferencias entre los pares deben ser independientes.
+  - Las diferencias deben ser medidas al menos a nivel ordinal (es decir, deben ser capaces de ser ordenadas).
+  
+**Cómo Funciona**
+
+  1. **Calcular Diferencias:** Calcula las diferencias entre los pares de medidas.
+  2. **Ordenar por Valor Absoluto:** Ordena estas diferencias por su valor absoluto.
+  3. **Asignar Rangos:** Asigna rangos a estas diferencias, empezando con 1 para la diferencia más pequeña en valor absoluto.
+  4. **Sumar Rangos Positivos y Negativos:** Suma los rangos para las diferencias positivas y negativas por separado.
+  5. **Estadística de Prueba:** La estadística de prueba es el menor de los dos rangos sumados.
+  6. **Comparación con la Distribución de Wilcoxon:** La estadística de prueba se compara entonces con una distribución de Wilcoxon para determinar si la diferencia es estadísticamente significativa.
+  
+**Interpretación**
+
+  - **Si el valor de p es Menor que el Nivel de Significancia (usualmente 0.05):** Existe evidencia suficiente para rechazar la hipótesis nula, sugiriendo que hay una diferencia significativa entre las dos muestras relacionadas.
+  - **Si No:** No hay suficiente evidencia para rechazar la hipótesis nula, lo que sugiere que no hay una diferencia significativa entre las muestras.
+  
+### [**Ejemplo en R**]{style="color:purple"}
+
+Se utiliza la escala de depresión de Hamilton en 9 pacientes con ansiedad y depresión, tomadas en una primera (x) y una segunda (y) visita después de iniciar la terapia con la administración de un tranquilizante.
+
+```{r}
+# Datos de la primera y segunda visita
+x <- c(1.83, 0.50, 1.62, 2.48, 1.68, 1.88, 1.55, 3.06, 1.30)
+y <- c(0.878, 0.647, 0.598, 2.05, 1.06, 1.29, 1.06, 3.14, 1.29)
+
+# Realizar la prueba de Wilcoxon para muestras relacionadas
+resultado_wilcoxon <- wilcox.test(x, y, paired = T)
+
+resultado_wilcoxon
+
+```
+Los resultados mostrarán la estadística de la prueba y el valor p, que ayudarán a determinar si hay una diferencia significativa en las puntuaciones de la escala de depresión de Hamilton entre las dos visitas.
+
+```{r}
+p_value_thresh <- 0.05
+
+if(resultado_wilcoxon$p.value > p_value_thresh) {
+  cat("p-valor =", resultado_wilcoxon$p.value, "\n")
+  cat("No rechazamos H0")
+} else {
+  cat("p-valor =", resultado_wilcoxon$p.value, "\n")
+  cat("Rechazamos H0")
+}
+
+```
+**Sin Especificar `alternative`:**
+
+Por defecto, `wilcoxon_test()` realiza una prueba de dos colas. Esto significa que la hipótesis alternativa es que las medianas de las dos muestras son diferentes, sin especificar la dirección de la diferencia. En este caso, estás probando si hay alguna diferencia (sea mayor o menor) entre las dos muestras.
+
+  - **Hipótesis Nula (H0):** La mediana de las diferencias entre las muestras es igual a cero.
+  - **Hipótesis Alternativa (H1):** La mediana de las diferencias entre las muestras no es igual a cero (puede ser mayor o menor).
+  
+**Especificando `alternative = "greater"`:**
+
+Cuando especificas `alternative = "greater"`, estás realizando una prueba de una cola. Esto significa que la hipótesis alternativa es que la mediana de las diferencias es mayor que cero. En otras palabras, esperas que la mediana de la primera muestra (en este caso, `x`) sea mayor que la de la segunda muestr (`y`).
+
+  - **Hipótesis Nula (H0):** La mediana de las diferencias entre las muestras es menor o igual a cero.
+  - **Hipótesis Alternativa (H1):** La mediana de las diferencias entre las muestras es mayor que cero.
+  
+**Implicaciones en la Interpretación:**
+
+La elección entre una prueba de una cola o de dos colas afecta cómo interpretas los resultados:
+
+  - **Prueba de Dos Colas:** Busca cualquier diferencia, ya sea que `x` sea mayor o menor que `y`.
+  - **Prueba de Una Cola (greater):** Busca evidencia específica de que `x` es mayor que `y`.
+  
+En general, las pruebas de una cola se utilizan cuando hay una hipótesis específica sobre la dirección del efecto.
+
+*** 
+
+## [**Prueba de Kruskal-Wallis**]{style="color:purple"}
+
+La Prueba de Kruskal-Wallis es una prueba estadística no paramétrica utilizada para determinar si hay diferencias significativas entre las medianas de dos o más grupos independientes. Es una extensión de la prueba U de Mann.Whitney para más de dos grupos. Esta prueba es especialmente útil cuando los datos no cumplen con los supuestos necesarios para el ANOVA, como la normalidad o la homogeneidad de varianzas.
+
+**¿Cuándo se Usa?**
+
+Se utiliza cuando se tienen datos de dos o más grupos independientes y se desea comparar sus medianas. Es comúnmente usada en situaciones donde el ANOVA no es apropiado debido a la no normalidad de los datos o cuando las mediciones son ordinales.
+
+**Supuestos de la Prueba**
+
+  - Las muestras provienen de grupos independientes.
+  - Las observaciones son al menos ordinales.
+  - Las distribuciones de los grupos son similares: la prueba se centra en comparar las medianas.
+  
+**¿Cómo funciona?**
+
+  1. **Ordenar y Asignar Rangos:** Todos los datos de todos los grupos se combinan y se ordenan de menor a mayor. A cada dato se le asigna un rango.
+  2. **Calcular Sumas de Rangos:** Para cada grupo, se suman los rangos de sus observaciones.
+  3. **Estadística de Prueba:** Se utiliza una fórmula específica para calcular la estadística de Kruskal-Wallis a partir de las sumas de rangos y los tamaños de muestra de cada grupo. Esta estadística sigue aproximadamente una distribución chi-cuadrado.
+  4. **Determinar la Significancia:** Se compara la estadística de prueba con un valor crítico de la distribución chi-cuadrado. Si la estadística de prueba es mayor que el valor crítico, se rechaza la hipótesis nula.
+  
+**Interpretación**
+
+  - **Si el valor p es Menor que el Nivel de Significancia (usualmente 0.05):** Se rechaza la hipótesis nula y se concluye que hay una diferencia significativa en las medianas entre al menos dos de los grupos.
+  - **Si No:** No se rechaza la hipótesis nula, lo que sugiere que no hay evidencia suficiente para afirmar que las medianas son diferentes entre los grupos.
+  
+### [**Ejemplo en R**]{style="color:purple"}
+
+Queremos saber qué tipo de spray es el más efectivo para eliminar insectos.
+
+Anteriormente, en la actividad anterior, se analizaron estos datos mediante un ANOVA, pero se observó que no cumplía con los supuestos, por lo que es mejor analizarlo mediante técnicas no paramétricas.
+
+Para analizar la efectividad de diferentes tipos de sprays para eliminar insectos utilizando la Prueba de Kruskal-Wallis, primero se definirán las hipótesis:
+
+**Hipótesis**
+
+  - **Hipótesis Nula (H0):** Todas las medianas de efectividad son iguales entre los diferentes tipos de sprays.
+  - **Hipótesis Alternativa (H1):** Al memnos una mediana de efectividad es diferente entre los diferentes sprays.
+  
+**Aplicación de la Prueba de Kruskal-Wallis**
+
+Primero, se extraerán los datos relevantes del conjunto de datos `InsectSprays`. Luego, se aplicará la Prueba de Kruskal-Wallis para comparar las medianas de efectividad entre los diferentes tipos de sprays.
+
+**Código en R:**
+
+```{r}
+# Carga de datos
+data("InsectSprays")
+
+# Asignación de los datos a una variable
+data <- InsectSprays
+
+# Prueba de Kruskal-Wallis
+resultado_kruskal <- kruskal.test(count ~ spray, data = data)
+
+resultado_kruskal
+```
+Se realiza la prueba de Kruskal-Wallis usando `kruskal.test`, donde `count` representa la efectividad de los sprays y `spray` son los diferentes tipos de sprays.
+
+Finalmente, se muestran los resultados que incluyen la estadística de Kruskal-Wallis y el valor p.
+
+Si el valor p es menor que el nivel de significancia (usualmente 0.05), entonces se rechazaría la hipótesis nula, concluyendo que hay diferencias significativas en la efectividad entre al menos algunos de los sprays. Si el valor p es mayor, no podemos rechazar la hipótesis nula, lo que sugiere que no hay evidencia suficiente para afirmar que existe una diferencia significativa en la efectividad entre los diferentes tipos de sprays.
+
+Una vez que se ha rechazado la hipótesis nula en una prueba de Kruskal-Wallis (indicando que al menos un grupo es significativamente diferente de los otros), las pruebas post hoc se utilizan para determinar exactamente entre qué grupos existen estas diferencias y la magnitud de dichas diferencias. Hay distintos métodos para realizar comparaciones múltiples post hoc, por ejemplo el **test de Nemenyi** y la **prueba de Wilcoxon por pares con ajuste de Bonferroni**.
+
+#### [**Test de Nemenyi**]{style="color:purple"} 
+
+El `kwAllPairsNemensyTest` de la librería `PMCMRplus` realiza el test de Nemenyi.
+
+  -**Cómo funciona:** Compara todos los pares de grupos y calcula una diferencia de rango crítica. Si la diferencia de rango entre dos grupos es mayor que esta diferencia crítica, se considera que hay una diferencia significativa entre esos grupos.
+  
+**Código en R:**
+
+```{r}
+# Primero se realiza la prueba de Kruskal-Wallis
+
+# Carga de datos
+data("InsectSprays")
+
+# Asignación de los datos a una variable
+data <- InsectSprays
+
+# Prueba de Kruskal-Wallis
+resultado_kruskal <- kruskal.test(count ~ spray, data = data)
+
+resultado_kruskal
+
+# Ahora, se realiza el test de Nemenyi para comparaciones post hoc
+library(PMCMRplus)
+resultado_nemenyi <- kwAllPairsNemenyiTest(count ~ spray, data = data)
+
+resultado_nemenyi
+```
+#### [**Prueba de Wilcoxon por Pares con Ajuste de Bonferroni**]{style="color:purple"}
+
+`pairwise.wilcox.test` realiza comparaciones por pares utilizando la prueba de Wilcoxon y ajusta los valores p para múltiples comparaciones utilizando el método de Bonferroni.
+
+  -**Cómo funciona:** Compara cada par de grupos utilizando la prueba de Wilcoxon. El ajuste de Bonferroni se aplica para controlar el error de Tipo I que surge al realizar múltiples comparaciones.
+  
+**Código en R:**
+
+```{r}
+# Primero se realiza la prueba de Kruskal-Wallis
+
+# Carga de datos
+data("InsectSprays")
+
+# Asignación de los datos a una variable
+data <- InsectSprays
+
+# Prueba de Kruskal-Wallis
+resultado_kruskal <- kruskal.test(count ~ spray, data = data)
+
+resultado_kruskal
+
+# Ahora, se realiza la prueba de Wilcoxon por pares con Ajuste de Bonferroni
+library(stats)
+pairwise_resultados <- pairwise.wilcox.test(data$count, data$spray, p.ajd = "bonf")
+
+pairwise_resultados
+```
+
+**Elección del Método**
+
+  - **Nemensy** es el más conservador y se usa comúnmente cuando los tamaños de muestra son iguales o similares. Es menos poderoso para detectar diferencias si los tamaños de muestra varían mucho.
+  
+  - **Wilcoxon por Pares con Bonferroni** es más flexible con diferentes tamaños de muestra y puede ser más poderoso, pero también puede ser más propenso a errores de Tipo I si no se controla adecuadamente.
+  
+***
+
+## [**Prueba de Friedman**]{style="color:purple"}
+
+La Prueba de Friedman es una prueba estadística no paramétrica que se utiliza para detectar diferencias en tratamientos a lo largo de múltiples intentos de prueba. Es la contraparte no paramétrica del ANOVA de dos vías para medidas repetidas y es ideal cuando los datos no cumplen con las condiciones necesarioas para el ANOVA, como la normalidad de los residuos o la homogeneidad de varianzas.
+
+**¿Cuándo se Utiliza?**
+
+Se utiliza cuando se tiene:
+
+  1. **Datos Dependientes o Relacionados:** Por ejemplo, mediciones repetidas en los mismos sujetos.
+  2. **Más de Dos Condiciones o Tratamientos:** A diferencia de la prueba de Wilcoxon, que es para dos condiciones relacionadas, la Prueba de Friedman puede manejar tres o más condiciones.
+  3. **Datos no Paramétricos:** Esto incluye datos ordinales o datos continuos que no cumplen con los supuestos de normalidad.
+  
+**Supuestos de la Prueba**
+
+  - Las observaciones dentro de cada grupo deben ser independientes.
+  - Los grupos o tratamientos deben ser aplicados en las mismas condiciones o sujetos.
+  - Las mediciones deben ser al menos ordinales.
+  
+**Cómo Funciona**
+  
+  1. **Rangos dentro de los Bloques:** Primero, los datos se organizan en bloques (por ejemplo, cada sujeto es un bloque). Dentro de cada bloque, se asignan rangos a las observaciones, de menor a mayor.
+  2. **Suma de Rangos para Cada Tratamiento:** Luego, para cada tratamiento, se suman los rangos obtenidos en todos los bloques.
+  3. **Estadística de Prueba:** Se calcula la estadística de prueba de Friedman, que tiene una distribución $\chi^2$ aproximada.
+  4. **Determinación de la Significancia:** Se compara la estadística de prueba con el valor crítico de la distribución $\chi^2$ para determinar si hay diferencias significativas.
+  
+**Interpretación**
+
+  - **Si el valor p es Menor que el Nivel de Significancia (usualmente 0.05):** Se rechaza la hipótesis nula, sugiriendo que hay diferencias significativas entre los tratamientos.
+  - **Si No:** No hay suficiente evidencia para rechazar la hipótesis nula, lo que sugiere que no hay una diferencia significativa entre los tratamientos.
+  
+### [**Ejemplo en R**]{style="color:purple"}
+
+**Catadores de Vino**
+
+El conjunto de datos `WineTasting` contiene información sobre una cata de vinos.
+
+**Análisis exploratorio:**
+
+```{r}
+library(WRS2)
+library(agricolae)
+library(ggplot2)
+library(dplyr)
+library(kableExtra)
+
+# Carga del conjunto de datos
+data(WineTasting)
+data <- WineTasting
+
+# Adjuntar datos
+attach(data)
+
+# Mostrar las dimensiones del conjunto de datos
+dim(data)
+
+data %>% head() %>% kable() %>% kable_styling
+
+
+```
+
+**Reestructuración de los datos**
+
+```{r}
+# Reestructuración de los datos
+y <- reshape(data,
+             v.names = "Taste",
+             idvar = "Taster", 
+             timevar = "Wine", 
+             direction = "wide")
+
+# Mostrar datos reestructurados
+y 
+
+```
+**Boxplot**
+
+```{r}
+
+boxplot(y[,-1], col = "purple", main = "Boxplot de las Puntuaciones de Vino", xlab = "Vino", ylab = "Puntuación")
+
+```
+El boxplot de los datos reestructurados es útil para visualizar las diferencias entre los grupos.
+
+**Prueba de Friedman**
+
+```{r}
+friedman.test(as.matrix(y[,-1]))
+```
+**Prueba Post Hoc con Wilcoxon**
+
+```{r}
+pairwise.wilcox.test(Taste,
+                     Wine,
+                     p.adj = "bonferroni",
+                     exact = F,
+                     paired = T)
+```
+***
+
+# [**Pruebas Robustas**]{style="color:purple"}
+
+Estos métodos son especialmente útiles cuando los datos no cumplen con los supuestos de normalidad y homogeneidad de varianzas, o cuando tienen outliers.
+
+## [**Prueba para 2 Muestras**]{style="color:purple"}
+
+### [**Muestras Independientes**]{style="color:purple"}
+
+Se examinarán datos de la liga española e inglesa de fútbol para comparar los goles por partido en ambas ligas.
+
+```{r}
+library(WRS2)
+data(eurosoccer)
+data <- eurosoccer
+data %>% head() %>% kable() %>% kable_styling()
+```
+```{r}
+levels(data$League)
+```
+```{r}
+#Consideraremos liga española y alemana
+spain_germany = data[which(data$League == "Spain" | data$League == "Germany"),]
+spain_germany$League = droplevels(spain_germany$League)
+
+
+```
+```{r}
+
+# Boxplots
+ggplot(spain_germany, aes(x = League, y = GoalsGame, fill = League)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("Spain" = "purple", "Germany" = "pink")) +
+  labs(title = "Goles por Partido en la Liga Española y Alemana",
+       x = "Liga",
+       y = "Goles por Partido") +
+  theme_minimal() +
+  theme(panel.background = element_rect(fill = "lightblue"),
+        plot.background = element_rect(fill = "lightblue"),
+        legend.background = element_rect(fill = "lightblue"),
+        legend.box.background = element_rect(fill = "lightblue"))
+
+```
+```{r}
+pb2gen(GoalsGame ~ League, data = data, est = "median")
+```
+Usamos `pb2gen` de la librería WRS2 para realizar una prueba robusta en las medianas, lo cual es útil dado que la liga española tiene algunos outliers.
+
+
+### [**Muestras Pareadas**]{style="color:purple"}
+
+Ahora, se comparan pesos antes y después de un tratamiento en un grupo de tratamiento familiar.
+
+```{r}
+library(MASS)
+data(anorexia)
+data <- anorexia
+data %>% kable() %>% kable_styling()
+```
+
+Se carga el conjunto de datos `anorexia`.
+
+```{r}
+anorexia_FT = subset(anorexia, subset = Treat == "FT")
+boxplot(anorexia_FT[,c("Prewt", "Postwt")], col = "purple")
+
+```
+
+Filtrando datos para el tratamiento familiar (`FT`) y visualizando los pesos antes y después del tratamiento.
+
+```{r}
+yuend(anorexia_FT$Prewt, anorexia_FT$Postwt)
+```
+Aplicamos la prueba de Yuend para muestras pareadas, que es una prueba robusta para comparar dos muestras relacionadas.
+
+***
+
+## [**Prueba para k Muestras (ANOVA Robusto de 1 Vía)**]{style="color:purple"} 
+
+### [**ANOVA Robusto Inter-Sujetos**]{style="color:purple"}
+
+
+
+```{r}
+
+library(ggplot2)
+
+
+# Cargar el dataset
+data(eurosoccer)
+data <- eurosoccer
+
+# Definir una paleta de colores rosados
+pink_palette <- c("England" = "#FFC0CB",  # Light Pink
+                  "Italy" = "#FFB6C1",    # Light Pink
+                  "Spain" = "#FF69B4",    # Hot Pink
+                  "Germany" = "#FF1493",  # Deep Pink
+                  "Netherlands" = "#C71585") # Medium Violet Red
+
+# Crear el boxplot con los colores rosados
+ggplot(data, aes(x = League, y = GoalsGame, fill = League)) +
+  geom_boxplot() +
+  scale_fill_manual(values = pink_palette) +
+  labs(title = "Goles por Partido en Diferentes Ligas",
+       x = "Liga",
+       y = "Goles por Partido") +
+  theme_minimal() +
+  theme(panel.background = element_rect(fill = "lightblue"),
+        plot.background = element_rect(fill = "lightblue"),
+        legend.background = element_rect(fill = "lightblue"),
+        legend.box.background = element_rect(fill = "lightblue"))
+```
+```{r}
+med1way(GoalsGame ~ League, data = data)
+```
+Se utiliza `med1way` para realizar un ANOVA robusto basado en medianas para comparar múltiples grupos (ligas en este caso).
+
+
+### [**ANOVA Robusto Intra-sujetos o de Medidas Repetidas**]{style="color:purple"}
+
+```{r}
+library(agricolae)
+data(WineTasting)
+data = WineTasting
+attach(data)
+
+boxplot(Taste ~ Wine, data = data, col = "purple")
+```
+Visualización de las puntuaciones de cata para cada tipo de vino.
+
+```{r}
+rmanova(Taste, Wine, Taster)
+```
+ ANOVA robusto para medidas repetidas con `rmanova`, que es adecuado cuando se tienen datos de medidas repetidas y se desea un enfoque robusto.
+
+
+
+
+

@@ -1,0 +1,339 @@
+---
+title: "16 SEMANA --- ACTIVIDAD 02"
+date: "`r Sys.Date()`"
+output: 
+  prettydoc::html_pretty:
+    toc: yes
+    theme: cerulean
+    math: katex
+always_allow_html: true
+---
+
+```{r setup, echo = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, comment = NA)
+
+```
+
+------------------------------------------------------------------------
+
+```{r}
+library(carData)
+library(agricolae)
+library(car) 
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(kableExtra)
+library(latexpdf)
+library(plotly)
+library(plyr)
+library(prettyR) 
+library(stats)
+library(tidyverse)
+library(webshot)
+library(dplyr)
+library(purrr)
+
+
+```
+
+*Responde a las siguientes cuestiones:*
+
+[**Cuestión 1**]{style="background:red"}
+
+Los pacientes que desarrollan cardiopatía isquémica (CI) han sido previamente diasnosticados de HTA con más frecuencia (odds = 1.5) que los que no desarrollan CI. En cambio, hay 1 hipertenso cada 9 sin HTA entre los que no desarrollan CI. Si el riesgo de desarrollar CI a lo largo de la vida es del 20%, ¿qué porcentaje de los hipertensos desarrollarán CI?
+
+**Recordatorio:** El "odds" (o razón de probabilidades) es una forma de expresar la probabilidad de que ocurra un evento en relación con la probabilida de que no ocurra.En otras palabras, mide la relación entre el número de eventos ocurridos y el número de eventos no ocurridos. matemáticamente: odds=p/1-p (por lo tanto, si odds > 1, es más probable que un evento ocurra a que no ocurra)
+
+**Resumen de los datos del enunciado:** CI+ = 20% (Riesgo de desarrollar CI a lo largo de la vida: 202%) odds = 1.5
+
+CI+ ---------> 1.5(HTA+) : 1(HTA-)
+
+```         
+  **1.5(x) + 1(x) = 20 -> X = 8**
+  
+  pacientes HTA+ y CI+:
+  **1.5(8) = 12**
+  
+  pacientes HTA- y CI+:
+  **1(8) = 8**
+  
+```
+
+CI- ---------> 1(HTA+) : 9(HTA-)
+
+```         
+  **1(y) + 9(y) = 80 -> y = 8**
+  
+  pacientes HTA+ y CI-:
+  **1(8) = 8**
+  
+  pacientes HTA- y CI-:
+  **9(8) = 72** 
+```
+
+Total, Total = 100%
+
+1.  `matrix()`: Esta es la función en R que se utiliza para crear una matriz.
+
+2.  `nrow = 3`: Este argumento especifica el número de filas de la matriz. En este caso, la matriz tendrá 3 filas.
+
+3.  `ncol =3`: Este argumento especifica el número de columnas de la matriz. Al igual que con las filas, la matriz tendrá 3 columnas.
+
+4.  `byrow = TRUE`: Este argumento determina cómo se deben llenar los elementos en la matriz. Si es `TRUE`, R llenará la matrioz por filas. Si es `FALSA`(el vzlor predeterminado), R llenará la matriz con columnas.
+
+5.  `dimnames`: Este argumento se utiliza para asignar nombres a las dimensiones de la matriz (es decir, a las filas y columnas). Es una lista con dos vectores:
+
+-   El primer vector (`c("CI+", "CI-", "Total")`) contiene los nombres de las filas.
+-   El segundo vector (`c("HTA+", "HTA-", "Total")`) contiene los nombres de las columnas.
+
+Entonces, la matriz resultante será 3X3 con las filas nombradas "CI+","CI-",Total", y las columnas "HTA+","HTA-","Total".
+
+```{r}
+# Creación de una matriz para representar los datos del problema
+
+A = matrix(nrow = 3,
+           ncol = 3,
+           byrow = T, #llenar la matriz por filas
+           dimnames = list(c("CI+","CI-","Total"), #dombre de las filas 
+                            c("HTA+","HTA-","Total"))) #Nombre de las columnas
+
+# Convertir la matriz a un dataframe
+
+df = as.data.frame(A)
+
+df %>% kable() %>% 
+  kable_styling("striped", 
+                full_width = F, 
+                position = "center", 
+                font_size = 16) %>% 
+  row_spec(0, monospace = T, bold = T, color = "black") %>% 
+  row_spec(1:3, color = "black") %>% 
+  column_spec(1:1, bold = T, color = "black")
+
+# Llenar la tabla con los valores calculados
+
+df[3,3] <- 100 # Porcentaje total de la población
+
+# Llenar la primera fila (pacientes con CI)
+
+df[1,3] <- 20 # Porcentaje total de pacientes con CI 
+df[1,1] <- 12 # Pacientes con CI e HTA 
+df[1,2] <- 8  # Pacientes con CI sin HTA
+
+# Llenar la segunda fila (pacientes sin CI)
+
+df[2,3] <- 80 # Porcentaje total de pacientes sin CI
+df[2,1] <- 8  # Pacientes sin CI pero con HTA 
+df[2,2] <- 72 # Pacientes sin CI y sin HTA
+
+# Calculando totales para pac. hipertensos y no hipertensos
+df[3,1] <- df[1,1] + df[2,1]  # Total de pac. ht.
+df[3,2] <- df[1,2] + df[2,2]  # Total de pac. no ht.
+
+# Mostrar la tabla llena
+df %>% kable() %>%
+  kable_styling("striped",
+                full_width = F,
+                position = "center",
+                font_size = 16) %>%
+  row_spec(0, monospace = T, bold = T, color = "black") %>% 
+  row_spec(1:3, color = "black") %>% 
+  column_spec(1:1, bold = T, color = "black")
+
+# Calculando el porcentaje de pac. HT que desarrollan CI
+resp_1 <- (df[1,1]/df[3,1]) * 100
+
+# Formateo el resultado como porcentaje
+resp_1_porcentaje <- paste0(round(resp_1), "%")
+
+# Imprimir el resultado formateado
+resp_1_porcentaje
+
+# Defino alternativas
+alternativas <- c("a) 0.6%", "b) 20%", "c) 80%,", "d) Es imposible calcularlo con estos datos", "e) Ninguna de las opciones anteriores es correcta.")
+
+valores_alternativas <- c(0.6,20,80) 
+
+# Verifico cuál es la respuesta correcta
+if (round(resp_1) %in% valores_alternativas) {
+  correcta <- alternativas[which(round(resp_1) == valores_alternativas)]
+} else {
+  correcta_1 <- "e) ninguna de las opciones anteriores es correcta."
+}
+
+correcta_1
+```
+
+## Resultado Cuestión 1 = La probabilidad de que una persona hipertensa desarrolle cardiopatía isquémica es del `r resp_1_porcentaje`. Por lo tanto, la respuesta correcta es la opción `r correcta_1`
+
+[**Cuestiones 2 y 3** ]{style="background:yellow"}
+
+Se valora, tras 4 años de seguimiento, si la exposición a cannabis se asocia o no al desarrollo de síntomas psicóticos:
+
+```{r}
+B = matrix(c(82,238,320,342,1775,2117,424,2013,2437),
+           nrow = 3,
+           ncol = 3,
+           byrow = T,
+           dimnames = list(c("si_cannabis","no_cannabis","Total"),
+                           c("si_SP", "no_SP","Total")))
+
+# Convierto matriz en un dataframe
+df <- data.frame(B)
+
+# formato tabla
+df %>% head() %>% kable() %>%
+  kable_styling("striped",
+                full_width = F,
+                position = "center",font_size = 16) %>%
+  row_spec(0, monospace = T, bold = T, color = "black") %>%
+  row_spec(1:3, color = "black") %>%
+  column_spec(1:1, bold = T, color = "black")
+
+
+```
+
+La probabilidad marginal de padecer algún síntoma psicótico es:
+
+1)  0.21
+2)  0.17
+3)  0.19
+4)  0.13
+5)  Ninguna de las opciones anteriores es correcta
+
+Para calcular la probabilidad marginal de padecer síntomas psicóticos, necesitamos dividir el total de casos con síntomas psicóticos (si_SP) por el total general de casos. En la tabla proporcionada, el total de casos con síntomas psicóticos es 424 y el total general de casos es 2437.
+
+-   Total si_SP ---------> 424
+-   Total, Total --------> 2437
+
+```{r}
+# Probabilidad marginal de padecer algún síntoma psicótico
+resp_2 <- round(df[3,1] / df[3,3], 2)
+resp_2
+
+# Defino las alternativas
+alternativas <- c("1) 0.21", "2) 0.17", "3) 0.19", "4) 0.13", "5) Ninguna de las opciones anteriores es correcta")
+
+# Vector de valores numéricos correspondientes a las alternativas
+valores_alternativas <- c(0.21, 0.17, 0.19, 0.13)
+
+# Verifico cuál alternativa es la correcta
+if (resp_2 %in% valores_alternativas) {
+  correcta_2 <- alternativas[which(resp_2 == valores_alternativas)]
+} else {
+  correcta_2 <- "5) Ninguna de las opciones anteriores es correcta"
+}
+
+# Imprimo la alternativa correcta
+correcta_2
+```
+## Resultado Cuestión 2 = La probabilidad marginal de padecer algún síntoma psicótico es `r resp_2`. Por lo tanto, la alternativa correcta es la opción `r correcta_2`
+
+La probabilidad de padecer algún síntoma psicótico condicionada a haber fumado cannabis >= 5 veces en la vida es: 
+
+1) 0.033
+2) 0.19
+3) 0.256
+4) 0.345
+5) Ninguna de las opciones anteriores es correcta
+
+
+El número de personas que han padecido síntomas psicóticos y han consumido cannabis más de 5 veces es 82.
+
+El número total de personas que han consumiedo cannabis más de 5 veces es 320.
+
+  - si_SP, si_cannabis ------> 82
+  - Total si_cannabis -------> 320
+  
+```{r}
+# Probabilidad de padecer algún síntoma psicótico condicionada al consumo de cannabis >= 5 veces en la vida
+resp_3 <- round(df[1,1]/df[1,3], 3)
+resp_3
+
+# Defino las alternativas
+alternativas <- c("1) 0.033", "2) 0.19", "3) 0.256", "4) 0.345", "5) Ninguna de las opciones anteriores es correcta")
+
+# Vector de valores numéricos correspondientes a las alternativas
+valores_alternativas <- c(0.033, 0.19, 0.256, 0.345)
+
+# Verifico cuál alternativa es la correcta
+if (resp_3 %in% valores_alternativas) {
+  correcta_3 <- alternativas[which(resp_3 == valores_alternativas)]
+} else {
+  correcta_3 <- "5) Ninguna de las opciones anteriores es correcta"
+}
+
+# Imprimo la alternativa correcta
+correcta_3
+```
+## Resultado Cuestión 3 = La probabilidad de padecer algún síntoma psicótico condicionada al consumo de cannabis >= 5 veces en la vida es `r resp_3`. Por lo tanto, la alternativa correcta es la opción `r correcta_3`
+
+<span style = "background:yellow">**Cuestión 4** </span>
+
+Se compara el diagnóstico clínico de úlcera gastroduodenal y su hallazgo en la autopsia en una serie de 10.000 pacientes. Al comenzar a analizar los datos, se construyer la siguiente tabla:
+
+```{r}
+
+C = matrix(c(130,20,150,170,9680,9850,300,9700,10000),
+           nrow = 3,
+           ncol = 3,
+           byrow = T,
+           dimnames = list(c("úlcera[+]","úlcera[-]","Total"),
+                           c("autopsia[+]","autopsia[-]","Total")))
+
+df = as.data.frame(C)
+
+df %>% kable() %>%
+  kable_styling("striped",
+                full_width = F,
+                position = "center",
+                font_size = 16) %>%
+  row_spec(0,monospace = T,bold = T,color = "black")%>%
+  row_spec(1:3,color = "black")%>%
+  column_spec(1,bold = T,color = "black")
+
+
+```
+
+
+De las siguientes cifras, ¿cuál es la más cercana a la probabilidad (en %) de obtener un diagnóstico clínico de úlcera condicionado a que la autopsia hubiese sido positiva?
+
+1) 3%
+2) 43%
+3) 87%
+4) 98%
+5) 100%
+
+```{r}
+#Número de casos con diagnósticco clínico de úlcera y autopsia positiva
+#df[1,1] ulcera+ y autopsia+
+
+#Total de casos con autopsia positiva
+#df[3,1] Total y autopsia+
+
+resp_4 <- round((df[1,1] / df[3,1])*100, 0)
+
+# Formateo el resultado como porcentaje
+resp_4_porcentaje <- paste0(round(resp_4), "%")
+
+# Imprimo el resultado formateado
+resp_4_porcentaje
+
+# Defino las alternativas
+alternativas <- c("1) 3%", "2) 43%", "3) 87%", "4) 98%", "5) 100%")
+
+# Vector de valores numéricos correspondientes a las alternativas
+valores_alternativas <- c(3, 43, 87, 98, 100)
+
+# Verifico cuál alternativa es la correcta
+if (resp_4 %in% valores_alternativas) {
+  correcta_4 <- alternativas[which(resp_4 == valores_alternativas)]
+}
+
+# Imprimo la alternativa correcta
+correcta_4
+```
+## Resultado Cuestión 4 = La probabilidad de obtener un diagnóstico clínico de úlcera condicionado a que la autopsia es positiva es de un `r resp_4_porcentaje`. Por lo tanto, la alternativa correcta es la opción `r correcta_4`
+

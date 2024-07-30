@@ -1,0 +1,259 @@
+---
+title: "SEMANA 20-ACTIVIDAD 06"
+author: "Sanchez Collao Javiera Andrea"
+date: "`r Sys.Date()`"
+output: 
+  prettydoc::html_pretty:
+    toc: yes
+    theme: hpstr
+    highlight: github
+    math: katex
+---
+
+```{r setup, echo = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, comment = NA)
+
+```
+
+------------------------------------------------------------------------
+
+[**Antes de comenzar a resolver las Preguntas, vamos a cargar las librerias en R**]{style="color:purple"}
+
+```{r}
+library(tidyverse)
+library(psych)
+library(kableExtra)
+library(ggplot2)
+library(readxl)
+
+```
+
+Los Errores pueden calsificarse en 2 tipos:
+
+1.- Sistematicos (Falta de validez): Estan producidos por un defecto en el instrumento de medicion o por una tendencia erronea del observador
+
+2.- Aleatoreos o accidentales (falta de precisión): son aqyellos debidos a causas impoderables e imposibles de controlar
+
+# [Pregunta 1]{style="color:purple"}
+
+[**Se estudia un nuevo método de menor coste para valorar la concentración de un biomarcador en plasma. Para ello se comparan los resultados con la técnica de referencia, más laboriosa y costosa. Indica cuál es la afirmación verdadera:**]{style="color:purple"}
+
+**Opción 1**
+**Si la nueva prueba mide valores que son un 30% superiores a la técnica de referencia, se trata de un error de precisión.**
+
+**Comentario:** Esta afirmación es incorrecta. Un error de precisión se refiere a la reproducibilidad de los resultados, es decir, qué tan cerca están las mediciones entre sí cuando se repite la prueba en condiciones iguales. Un error sistemático que mide consistentemente un 30% más alto que la referencia indicaría un problema de exactitud, no de precisión. La precisión evalúa la variabilidad de los resultados repetidos, mientras que la exactitud evalúa qué tan cerca están los resultados del valor verdadero. Un error sistemático (sesgo) indica que hay un desvío constante en una dirección específica (en este caso, siempre un 30% más alto), lo cual es un problema de exactitud.
+
+**Opción 2**
+**Si las mediciones obtenidas con la nueva técnica tienen un coeficiente de variación del 50% intersujetos, a la nueva técnica le faltará validez.**
+
+**Comentario:** Esta afirmación es incorrecta. El coeficiente de variación (CV) mide la dispersión relativa de las mediciones y se calcula como la desviación estándar dividida por la media, expresado como un porcentaje. Un CV alto (50%) indica alta variabilidad entre los sujetos, lo cual puede sugerir problemas de precisión (reproducibilidad), pero no directamente falta de validez. La validez se refiere a qué tan bien mide la prueba lo que se supone que debe medir (concordancia con la técnica de referencia), mientras que la precisión se refiere a la consistencia de los resultados. Es posible tener una prueba válida que no sea precisa y viceversa.
+
+**Opción 3**
+**Para obtener el coeficiente de variación es preciso dividir la varianza entre la media de las mediciones.**
+
+**Comentario:** Esta afirmación es incorrecta. El coeficiente de variación (CV) se calcula dividiendo la desviación estándar entre la media y luego multiplicando por 100 para expresarlo como un porcentaje:
+\[ CV = \left( \frac{\text{Desviación Estándar}}{\text{Media}} \right) \times 100 \]
+La varianza es el cuadrado de la desviación estándar, por lo que dividir la varianza entre la media no da el coeficiente de variación, sino una medida incorrecta de dispersión.
+
+**Opción 4**
+**La presencia de errores sistemáticos implica una falta de precisión.**
+
+**Comentario:** Esta afirmación es incorrecta. Los errores sistemáticos afectan la exactitud (validez) de las mediciones, no la precisión. La precisión se refiere a la consistencia de los resultados al repetir las mediciones. Un error sistemático es un sesgo constante en una dirección (por ejemplo, siempre midiendo un 30% más alto), lo cual indica que hay un problema en la exactitud de la medición, no en la precisión. Una prueba puede ser precisa (resultados consistentes) pero no exacta (desviada sistemáticamente del valor verdadero).
+
+### **Opción 5**
+<span style="background-color: yellow;">**Todas las afirmaciones anteriores son falsas.**</span>
+
+**Comentario:** Esta afirmación es correcta. Todas las afirmaciones anteriores contienen errores conceptuales en la descripción de precisión, validez, y el cálculo del coeficiente de variación.
+
+<span style="background-color: yellow;">**Respuesta:** Todas las afirmaciones anteriores son falsas.</span>
+
+
+# [Pregunta 2]{style="color:purple"}
+
+[**Indica la respuesta verdadera:**]{style="color:purple"}
+
+**Opción 1**
+**El coeficiente de variación no es una medida útil para valorar errores aleatorios.**
+
+**Comentario:** **Esta afirmación es incorrecta.** El coeficiente de variación (CV) es una medida de dispersión relativa que se calcula como la desviación estándar dividida por la media y se expresa como un porcentaje. Es útil para valorar la variabilidad relativa de los datos y, por lo tanto, puede ayudar a identificar errores aleatorios. Un CV alto indica alta variabilidad y posibles errores aleatorios.
+
+**Opción 2**
+**Un coeficiente de variación elevado implica la ausencia de validez.**
+
+**Comentario:** **Esta afirmación es incorrecta.** Un coeficiente de variación (CV) elevado indica alta variabilidad en los datos, lo que puede ser un problema de precisión (reproducibilidad) y no necesariamente de validez. La validez se refiere a qué tan bien una prueba mide lo que se supone que debe medir. Un CV elevado no implica automáticamente falta de validez.
+
+**Opción 3**
+**Una falta de validez conlleva obligatoriamente una falta de precisión.**
+
+**Comentario:** **Esta afirmación es incorrecta.** La validez y la precisión son conceptos diferentes. Una prueba puede ser precisa (resultados consistentes) pero no válida (no mide lo que se supone que debe medir), y viceversa. La falta de validez no implica necesariamente una falta de precisión.
+
+### **Opción 4**
+<span style="background-color: yellow;">**Un bajo coeficiente de variación intrasujetos no es indicativo de falta de precisión.**</span>
+
+**Comentario:** **Esta afirmación es correcta.** Un bajo coeficiente de variación (CV) intrasujetos indica baja variabilidad en los resultados de un mismo sujeto, lo que sugiere alta precisión. La precisión se refiere a la reproducibilidad de los resultados, y un bajo CV intrasujetos es un buen indicativo de precisión.
+
+**Respuesta:** <span style="background-color: yellow;">**Un bajo coeficiente de variación intrasujetos no es indicativo de falta de precisión.**</span>
+
+**Opción 5**
+**Todas las afirmaciones anteriores son verdaderas.**
+
+**Comentario:** **Esta afirmación es incorrecta.** Como se explicó en los comentarios anteriores, las afirmaciones 1, 2 y 3 son incorrectas. La afirmación 4 es correcta.
+
+
+# [Pregunta 3]{style="color:purple"}
+
+[**En relación con los intervalos de confianza, indique cuál de las siguientes afirmaciones es falsa:**]{style="color:purple"}
+
+**Opción 1**
+**El intervalo de confianza contiene una serie de valores que se confía en que contengan el verdadero parámetro poblacional.**
+
+**Comentario:** **Esta afirmación es correcta.** Un intervalo de confianza es un rango de valores, derivado de los datos muestrales, que se utiliza para estimar un parámetro poblacional. Se confía en que este intervalo contiene el verdadero valor del parámetro con un cierto nivel de confianza (por ejemplo, 95%).
+
+**Opción 2**
+**Para calcular el intervalo de confianza es preciso calcular en la muestra el estimador apropiado y el error estándar.**
+
+**Comentario:** **Esta afirmación es correcta.** Para construir un intervalo de confianza, se necesita un estimador (por ejemplo, la media muestral) y el error estándar de este estimador. El error estándar mide la precisión con la que el estimador estima el parámetro poblacional.
+
+### **Opción 3**
+ <span style="background-color: yellow;">**El error estándar empleado para calcular intervalos de confianza y contrastes de hipótesis es un indicador de la variabilidad de los individuos.****</span>
+
+**Comentario:** **Esta afirmación es falsa.** El error estándar no mide la variabilidad de los individuos en la población, sino la variabilidad de un estimador (como la media muestral) de una muestra a otra. La variabilidad de los individuos se mide con la desviación estándar de la población.
+
+**Respuesta:** <span style="background-color: yellow;">**El error estándar empleado para calcular intervalos de confianza y contrastes de hipótesis es un indicador de la variabilidad de los individuos.**</span>
+
+**Opción 4**
+**Un intervalo de confianza al 95% se suele obtener al restar y sumar el error estándar multiplicado por 1,96.**
+
+**Comentario:** **Esta afirmación es correcta.** Para un intervalo de confianza del 95%, se utiliza el valor crítico de 1,96 (aproximadamente) cuando se asume una distribución normal. El intervalo se construye sumando y restando este valor crítico multiplicado por el error estándar al estimador.
+
+**Opción 5**
+**Para calcular un intervalo de confianza al 90% se suele restar y sumar el error estándar multiplicado por 1,645.**
+
+**Comentario:** **Esta afirmación es correcta.** Para un intervalo de confianza del 90%, se utiliza el valor crítico de 1,645 (aproximadamente) cuando se asume una distribución normal. El intervalo se construye sumando y restando este valor crítico multiplicado por el error estándar al estimador.
+
+
+
+# [Pregunta 4]{style="color:purple"}
+
+[**Un artículo de una revista científica informa de que el intervalo de confianza al 95% del nivel medio de colesterolemia en los adultos atendidos en un centro de salud es 192-208. Se aceptó que la variable tenía una distribución normal y el número de pacientes estudiados fue 100. ¿Cuál de las siguientes afirmaciones es falsa?**]{style="color:purple"}
+
+**Opción 1**
+**La confianza de que el nivel medio poblacional esté comprendido entre 192 y 208 es del 95%.**
+
+**Comentario:** **Esta afirmación es correcta.** Un intervalo de confianza al 95% implica que tenemos un 95% de confianza en que el verdadero nivel medio poblacional se encuentra entre 192 y 208.
+
+**Opción 2**
+**Si la media poblacional coincidiese con la muestral y se repitiese el estudio muchas veces, en un 95% de ellas se obtendría una media muestral comprendida entre 192 y 208.**
+
+**Comentario:** **Esta afirmación es correcta.** Esto es el significado de un intervalo de confianza del 95%. Si repitiéramos el estudio muchas veces, esperaríamos que el 95% de los intervalos de confianza calculados a partir de esas muestras contengan la verdadera media poblacional.
+
+### **Opción 3**
+<span style="background-color: yellow;">**El 95% de los adultos de la población tiene un nivel de colesterolemia comprendido entre 192 y 208.****</span>
+
+**Comentario:** **Esta afirmación es falsa.** El intervalo de confianza se refiere al nivel medio poblacional, no al nivel de colesterolemia de los individuos. Decir que el 95% de los individuos tienen niveles de colesterolemia entre 192 y 208 es incorrecto.
+
+**Respuesta:** <span style="background-color: yellow;">**El 95% de los adultos de la población tiene un nivel de colesterolemia comprendido entre 192 y 208.**</span>
+
+**Opción 4**
+**La media muestral encontrada en el estudio es de 200.**
+
+**Comentario:** **Esta afirmación es correcta.** El intervalo de confianza se centra alrededor de la media muestral, que es el punto medio de 192 y 208. Por lo tanto, la media muestral es (192 + 208) / 2 = 200.
+
+
+**Opción 5**
+**La desviación típica muestral encontrada en el estudio es aproximadamente 40.**
+
+**Comentario:** **Esta afirmación es incorrecta.** La desviación estándar muestral (σ) se puede calcular a partir del intervalo de confianza usando la fórmula del error estándar: \( \text{Error Estándar} = \frac{\sigma}{\sqrt{n}} \). Sabemos que el error estándar para un intervalo de confianza del 95% es \( \text{Error Estándar} = \frac{208 - 192}{2 \times 1.96} = \frac{16}{3.92} \approx 4.08 \). Entonces, \( \sigma = 4.08 \times \sqrt{100} = 40.8 \). La afirmación es aproximadamente correcta, pero el valor exacto es un poco mayor que 40.
+
+
+
+# [Pregunta 5]{style="color:purple"}
+
+[**En una muestra de 100 sujetos, la variable índice de masa corporal (IMC) sigue una distribución normal, con media 24 kg/m² y varianza 4 kg/m². ¿Entre qué valores estaría aproximadamente el 95% central de los sujetos de la distribución del IMC?**]{style="color:purple"}
+
+### **Opción 1**
+<span style="background-color: yellow;">**Entre 20 y 28.**</span>
+
+**Comentario:** **Esta afirmación es correcta.** Calculamos el intervalo utilizando la fórmula \( \mu \pm 1.96 \sigma \).
+
+**Respuesta:** <span style="background-color: yellow;">**Entre 20 y 28.**</span>
+
+**Opción 2**
+**Entre 16 y 32.**
+
+**Comentario:** **Esta afirmación es incorrecta.** Este rango es demasiado amplio para representar el 95% central de una distribución normal con media 24 y desviación estándar 2.
+
+**Opción 3**
+**Entre 23,2 y 24,8.**
+
+**Comentario:** **Esta afirmación es incorrecta.** Este intervalo es demasiado estrecho para representar el 95% central de una distribución normal con media 24 y desviación estándar 2.
+
+**Opción 4**
+**Entre 23,6 y 24,4.**
+
+**Comentario:** **Esta afirmación es incorrecta.** Este intervalo es mucho más estrecho de lo que sería el 95% central para una distribución normal con media 24 y desviación estándar 2.
+
+
+
+```{r}
+# Calcular el intervalo del 95% central para una distribución normal
+media <- 24
+desviacion_estandar <- sqrt(4)
+limite_inferior <- media - 1.96 * desviacion_estandar
+limite_superior <- media + 1.96 * desviacion_estandar
+
+intervalo_95 <- c(limite_inferior, limite_superior)
+intervalo_95
+```
+
+
+
+# [Pregunta 6]{style="color:purple"}
+
+[**¿Cuál es el intervalo de confianza al 95% de la media de edad (media = 58 años) de una muestra compuesta de 400 sujetos que no sigue la distribución normal, si su desviación estándar es 10 años?**]{style="color:purple"}
+
+**Opción 1**
+**38 a 78.**
+
+**Comentario:** **Esta afirmación es incorrecta.** Este rango es demasiado amplio para un intervalo de confianza al 95%.
+
+**Opción 2**
+**48 a 68.**
+
+**Comentario:** **Esta afirmación es incorrecta.** Este rango es también demasiado amplio para un intervalo de confianza al 95%.
+
+**Opción 3**
+**57,5 a 58,5.**
+
+**Comentario:** **Esta afirmación es incorrecta.** Este rango es demasiado estrecho para un intervalo de confianza al 95%.
+
+### **Opción 4**
+<span style="background-color: yellow;">**57 a 59.**</span>
+
+**Comentario:** **Esta afirmación es correcta.** Calculamos el intervalo utilizando la fórmula para el intervalo de confianza al 95%.
+
+**Respuesta:** <span style="background-color: yellow;">**57 a 59.**</span>
+
+**Opción 5**
+**No es posible calcularlo, pues no sigue una distribución normal.**
+
+**Comentario:** **Esta afirmación es incorrecta.** A pesar de que la muestra no sigue una distribución normal, el tamaño de la muestra es grande (n=400), por lo que podemos aplicar el teorema central del límite para aproximar la distribución de la media muestral a una distribución normal.
+
+
+
+```{r}
+# Calcular el intervalo de confianza al 95% para la media de edad
+media <- 58
+desviacion_estandar <- 10
+n <- 400
+error_estandar <- desviacion_estandar / sqrt(n)
+z <- 1.96
+
+limite_inferior <- media - z * error_estandar
+limite_superior <- media + z * error_estandar
+
+intervalo_95 <- c(limite_inferior, limite_superior)
+intervalo_95
+```
+

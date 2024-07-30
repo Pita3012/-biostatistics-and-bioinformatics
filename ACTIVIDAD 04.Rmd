@@ -1,0 +1,444 @@
+---
+title: "SEMANA 18-ACTIVIDAD 04"
+author: "Sanchez Collao Javiera Andrea"
+date: "`r Sys.Date()`"
+output: 
+  prettydoc::html_pretty:
+    toc: yes
+    theme: hpstr
+    highlight: github
+    math: katex
+---
+
+```{r setup, echo = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, comment = NA)
+
+```
+
+------------------------------------------------------------------------
+
+[**Antes de comenzar a resolver las Preguntas, vamos a cargar las librerias en R**]{style="color:purple"}
+
+```{r}
+library(tidyverse)
+library(psych)
+library(kableExtra)
+library(ggplot2)
+library(plotly)
+
+
+```
+
+# Función de Densidad de una Distribución Normal
+
+La función de densidad para la distribución normal con media $\mu$ y desviación estándar $\sigma$ es:
+
+$$f(x) = \frac{1}{\sigma \sqrt{2\pi}} \exp \left( -\frac{(x - \mu)^2}{2\sigma^2} \right) $$
+
+[**Consideremos una variable aleatoria X con una distribución normal y con parámetros mu = 2 y sigma = 1.1. Se calcula y/o realiza:**]{style="color:pink"}
+
+[**1 Pregunta) La probabilidad de que X sea menor o igual que 3**]{style="color:purple"}
+
+```{r}
+mu <- 2
+sigma <- 1.1
+
+probabilidad_menor_igual_3 <- pnorm(3, mean = mu, sd = sigma)
+
+paste("La probabilidad de que X sea menor o igual que 3 es:", probabilidad_menor_igual_3)
+
+# respuesta con 4 cifras significativas
+resp_1 <- round(probabilidad_menor_igual_3, 4)
+
+```
+
+#### Respuesta 1) La probabilidad de que X sea menor o igual que 3 es `r resp_1`
+
+$$P(X\leq 3) \; = \; r round(probabilidad_menor_igual_3)`$$
+
+[**2 Pregunta) La probabilidad de que X sea menor o igual que 3**]{style="color:purple"}
+
+```{r}
+probabilidad_mayor_igual_3 <- 1 - pnorm(3, mean = mu, sd = sigma)
+paste("La probabilidad de que X sea mayor o igual que 3 es:", probabilidad_mayor_igual_3)
+
+resp_2 <- round(probabilidad_mayor_igual_3 , 4)
+
+```
+
+#### Respuesta 2) La probabilidad de que X sea mayor o igual que 3 es `r resp_2`
+
+[**3 Pregunta) Gráfico para su función de densidad**]{style="color:purple"}
+
+```{r}
+# Parámetros de la distribución normal
+mu <- 0
+sigma <- 1
+
+# Datos para el gráfico
+x <- seq(mu - 4*sigma, mu + 4*sigma, length = 100)
+y <- dnorm(x, mean = mu, sd = sigma)
+
+# Creación del gráfico
+grafico_1 <- ggplot(data.frame(x, y), aes(x, y)) +
+  geom_line(color = "pink") +
+  labs(title = "Función de Densidad N", 
+       x = "Valor de X", 
+       y = "Densidad de Probabilidad") +
+  theme_minimal()
+
+# Convertir el gráfico a plotly para que sea interactivo
+resp_3 <- ggplotly(grafico_1)
+
+# Mostrar el gráfico interactivo
+resp_3
+
+
+```
+
+#### Respuesta 3) Gráfico para la función de densidad: `r resp_3`
+
+[**4 Pregunta) Gráfico para su función de distribución**]{style="color purple"}
+
+```{r}
+# Datos para el gráfico
+cdf <- pnorm(x, mean = mu, sd = sigma)
+
+# Creación del gráfico
+grafico_2 <- ggplot(data.frame(x, cdf), aes(x, cdf)) +
+  geom_line(color = "purple") +
+  labs(title = "Función de Distribución Acumulada de la Distribución Normal", 
+       x = "Valor de X", 
+       y = "Probabilidad Acumulada") +
+  theme_minimal()
+
+# gráfico a plotly para que sea interactivo
+resp_4 <- ggplotly(grafico_2)
+```
+
+#### Respuesta 4) Gráfico para la función de distribución: `r resp_4`
+
+[**5 Pregunta) Gráfico para los cuantiles**]{style="color:purple"}
+
+```{r}
+# Cargar las librerías necesarias
+library(ggplot2)
+library(plotly)
+
+# Parámetros de la distribución normal
+mu <- 0
+sigma <- 1
+
+# Datos para el gráfico
+quantiles <- qnorm(seq(0.01, 0.99, by = 0.01), mean = mu, sd = sigma)
+probabilidades <- seq(0.01, 0.99, by = 0.01)
+
+# Creación del gráfico
+grafico_3 <- ggplot(data.frame(quantiles, probabilidades), aes(quantiles, probabilidades)) +
+  geom_line(color = "#FF00FF") +  # Código hexadecimal para el color fucsia
+  labs(title = "Gráfico de los Cuantiles de la Distribución Normal", 
+       x = "Cuantiles", 
+       y = "Probabilidad") +
+  theme_minimal()
+
+# Gráfico a plotly para que sea interactivo
+resp_5 <- ggplotly(grafico_3)
+
+# Mostrar el gráfico interactivo
+resp_5
+
+```
+
+#### Respuesta 5) Gráfico para los cuantiles: `r resp_5`
+
+[**6.Pregunta a) El valor de k, tal que: P(X \>= k) = 0.83**]{style="color:purple"}
+
+Para encontrar $k$, necesitamos calcular el cuantil correspondiente a la probabilidad acumulada complementaria, es decir, $P(X \leq k) = 1 - 0.83 = 0.17$. Usaremos la función `qnorm()` para esto.
+
+```{r}
+k1 <- qnorm(1 - 0.83, mean = mu, sd = sigma)
+paste("El valor de k tal que P(X >= k) = 0.83 es:", k1)
+
+# Como me entregan un P() con 2 cifras significativas, la respuesta también la entregaré con 2 cs.
+resp_6a <- round(k1, 2)
+resp_6a
+```
+
+#### Respuesta 6.a) El valor de k tal que P(X \>= k) = 0.83, es `r resp_6a`
+
+[**6.Pregunta b) El valor de k, tal que: P(X \<= k) = 0.95**]{style="color:purple"}
+
+Para encontrar $k$, necesitamos calcular el cuantil correspondiente a la probabilidad acumulada, es decir, $P(X \leq k) = 0.95$. Usaremos la función \texttt{qnorm()} para esto.
+
+```{r}
+# Parámetros de la distribución normal
+mu <- 0
+sigma <- 1
+
+k <- qnorm(0.95, mean = mu, sd = sigma)
+paste("El valor de k tal que P(X <= k) = 0.95 es:", k)
+
+# Como me entregan un P() con 2 cifras significativas, la respuesta también la entregaré con 2 cs.
+resp_6b <- round(k, 2)
+resp_6b
+```
+
+#### Respuesta 6.b) El valor de k tal que P(X \<= k) = 0.95, es `r resp_6b`
+
+[**6.c Pregunta) El valor de** $k$, tal que: $P(k < X < 3.1) = 0.75$]{style="color:purple"}
+
+El enfoque correcto sería encontrar el área que se acumula hasta $k$ de tal manera que el área total entre $k$ y 3.1 sea 0.75. Por lo tanto, primero se calculará la probabilidad acumulada hasta 3.1. Luego, se le restará 0.75 de la probabilidad acumulada hasta 3.1 para obtener la probabilidad acumulada hasta $k$. Finalmente, se usará `qnorm()` para encontrar $k$.
+
+```{r}
+# Parámetros de la distribución normal
+mu <- 1.5
+sigma <- 0.5
+
+# Probabilidad acumulada hasta 3.1
+prob_3.1 <- pnorm(3.1, mean = mu, sd = sigma)
+
+# Restar 0.75 de esta probabilidad acumulada para encontrar la probabilidad acumulada hasta k
+prob_k <- prob_3.1 - 0.75
+
+# Asegurarse de que la probabilidad acumulada hasta k esté en el rango [0, 1]
+if (prob_k < 0) {
+  prob_k <- 0.01  # Ajustar a un valor mínimo positivo
+}
+
+# valor de k
+k3 <- qnorm(prob_k, mean = mu, sd = sigma)
+paste("El valor de k tal que P(k < X < 3.1) = 0.75 es:", k3)
+
+# Redondear la respuesta a 2 cifras significativas
+resp_6c <- round(k3, 2)
+resp_6c
+```
+
+#### Respuesta 6.c) El valor de k tal que P(k \< X \< 3.1) = 0.75, es `r resp_6c`
+
+Si la variable aleatoria $X$ tiene una distribución normal con parámetros $\mu = 50$ y $\sigma^2 = 100$, la probabilidad de que $X$ sea menor o igual que 40 se calcula utilizando la distribución normal estándar.
+
+[**7 Pregunta) La probabilidad de que X sea menor o igual que 40**]{style="color:purple"}
+
+Primero, estandarizamos $X$:
+
+$$
+Z = \frac{X - \mu}{\sigma}
+$$
+
+Donde: $$
+\mu = 50, \quad \sigma = \sqrt{100} = 10
+$$
+
+Para $X = 40$:
+
+$$
+Z = \frac{40 - 50}{10} = -1
+$$
+
+Luego, calculamos la probabilidad de que $Z$ sea menor o igual que -1 utilizando la función de distribución acumulada de la normal estándar $\Phi(z)$:
+
+$$
+P(X \leq 40) = P(Z \leq -1) = \Phi(-1)
+$$
+
+Usando R, obtenemos:
+
+```{r}
+# Parámetros de la distribución normal
+mu <- 50
+sigma <- 10
+
+# Valor de X
+x <- 40
+
+# Estandarización de X
+z <- (x - mu) / sigma
+
+# Calcular la probabilidad utilizando la función de distribución acumulada
+probabilidad <- pnorm(z)
+
+resp_7 <- probabilidad
+resp_7
+```
+
+#### Respuesta 7) La probabilidad de que X sea menor o igual que 40 es: `r resp_7`
+
+[**8 Pregunta) La probabilidad de que X se encuentre en el intervalo [-60,60]**]{style="color:purple"}
+
+La probabilidad de que $X$ se encuentre en el intervalo $[-60, 60]$ para una distribución normal con parámetros $\mu = 50$ y $\sigma^2 = 100$ se calcula de la siguiente manera:
+
+Primero, estandarizamos los límites del intervalo y calculamos las probabilidades acumuladas en esos puntos usando la función de distribución acumulada de la normal estándar $\Phi(z)$:
+
+$$
+P(-60 \leq X \leq 60) = \Phi\left(\frac{60 - \mu}{\sigma}\right) - \Phi\left(\frac{-60 - \mu}{\sigma}\right)
+$$
+
+Donde: $$
+\mu = 50, \quad \sigma = \sqrt{100} = 10
+$$
+
+Entonces, calculamos: $$
+P(-60 \leq X \leq 60) = \Phi\left(\frac{60 - 50}{10}\right) - \Phi\left(\frac{-60 - 50}{10}\right)
+$$ $$
+= \Phi(1) - \Phi(-11)
+$$
+
+Usando R, obtenemos la probabilidad acumulada:
+
+```{r}
+# Parámetros de la distribución normal
+mu <- 50
+sigma <- sqrt(100)
+
+# Calcular la probabilidad de que X se encuentre en el intervalo [-60, 60]
+probabilidad_entre_60 <- pnorm(60, mean = mu, sd = sigma) - pnorm(-60, mean = mu, sd = sigma)
+paste("La probabilidad de que X se encuentre entre -60 y 60 es:", probabilidad_entre_60)
+
+# Redondear la respuesta a 4 cifras significativas
+resp_8 <- round(probabilidad_entre_60, 4)
+
+resp_8
+```
+
+#### Respuesta 8) La probabilidad de que X se encuentre en el intervalo [-60,60] es de: `r resp_8`
+
+------------------------------------------------------------------------
+
+# Análisis Exploratorio dataset Iris:
+
+A continuación un resumen estadístico de las variables y boxplots de Longitud y Ancho sepálico y de pétalo:
+
+```{r}
+# Cargar el dataset
+data(iris)
+
+# Resumen estadístico de las variables
+summary(iris)
+```
+
+### Boxplots de Longitud y Ancho de Sépalo y Pétalo
+
+```{r}
+# Colores
+colors <- c("setosa" = "skyblue", "versicolor" = "pink", "virginica" = "purple")
+
+# Boxplot para Longitud de sépalo
+p_box_sepal_length <- ggplot(iris, aes(x = Species, y = Sepal.Length, fill = Species)) +
+  geom_boxplot() +
+  scale_fill_manual(values = colors) +
+  labs(title = "Boxplot de Longitud de Sépalo por Especie",
+       x = "Especie",
+       y = "Longitud sepálica") +
+  theme_minimal()
+boxplot_longitud_sepalo <- ggplotly(p_box_sepal_length)
+boxplot_longitud_sepalo
+
+# Boxplot para ancho de sépalo
+p_box_sepal_width <- ggplot(iris, aes(x = Species, y = Sepal.Width, fill = Species)) +
+  geom_boxplot() +
+  scale_fill_manual(values = colors) +
+  labs(title = "Boxplot de Ancho de Sépalo por Especie",
+       x = "Especie",
+       y = "Ancho sepálico") +
+  theme_minimal()
+boxplot_ancho_sepalo <- ggplotly(p_box_sepal_width)
+boxplot_ancho_sepalo
+
+# Boxplot para Longitud de Pétalo
+p_box_petal_length <- ggplot(iris, aes(x = Species, y = Petal.Length, fill = Species)) +
+  geom_boxplot() +
+  scale_fill_manual(values = colors) +
+  labs(title = "Boxplot de Longitud de pétalo por Especie",
+       x = "Especie",
+       y = "Longitud de pétalo") +
+  theme_minimal()
+boxplot_longitud_petalo <- ggplotly(p_box_petal_length)
+boxplot_longitud_petalo
+
+# Boxplot para Ancho de pétalo
+p_box_petal_width <- ggplot(iris, aes(x = Species, y = Petal.Width, fill = Species)) +
+  geom_boxplot() +
+  scale_fill_manual(values = colors) +
+  labs(title = "Boxplot de Ancho de Pétalo por Especie",
+       x = "Especie",
+       y = "Ancho de Pétalo") +
+  theme_minimal()
+boxplot_ancho_petalo <- ggplotly(p_box_petal_width)
+boxplot_ancho_petalo
+
+```
+### Grafico densidad
+
+```{r}
+# Gráfico de densidad para Longitud De Sépalo
+p_density_sepal_length <- ggplot(iris, aes(x = Sepal.Length, fill = Species)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = colors) +
+  labs(title = "Gráfico de Densidad de Longitud De Sépalo por Especie",
+       x = "Longitud de Sépalo",
+       y = "Densidad") +
+  theme_minimal()
+densidad_largo_sepalo <- ggplotly(p_density_sepal_length)
+densidad_largo_sepalo
+
+# Gráfico de densidad para Ancho de Sépalo
+p_density_sepal_width <- ggplot(iris, aes(x = Sepal.Width, fill = Species)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = colors) +
+  labs(title = "Gráfico de Densidad de Ancho Sepálico por Especie",
+       x = "Ancho de Sépalo",
+       y = "Densidad") +
+  theme_minimal()
+densidad_ancho_sepalo <- ggplotly(p_density_sepal_width)
+densidad_ancho_sepalo
+
+# Gráfico de densidad para Largo de Pétalo
+p_density_petal_length <- ggplot(iris, aes(x = Petal.Length, fill = Species)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = colors) +
+  labs(title = "Gráfico de Densidad de Largo de Pétalo por Especie",
+       x = "Longitud de pétalo",
+       y = "Densidad") +
+  theme_minimal()
+densidad_largo_petalo <- ggplotly(p_density_petal_length)
+densidad_largo_petalo
+
+# Gráfico de densidad para Ancho de Pétalo
+p_density_petal_width <- ggplot(iris, aes(x = Petal.Width, fill = Species)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = colors) +
+  labs(title = "Gráfico de Densidad de Ancho de Pétalo por especie",
+       x = "Ancho de Pétalo",
+       y = "Densidad") +
+  theme_minimal()
+densidad_ancho_petalo <- ggplotly(p_density_petal_width)
+densidad_ancho_petalo
+```
+
+### Grafico dispresion
+
+```{r}
+# Gráfico de dispersión para Largo y Ancho de Sépalo
+p_scatter_sepal <- ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
+  geom_point() +
+  scale_color_manual(values = colors) +
+  labs(title = "Gráfico de Dispersión de Largo y Ancho de Sépalo por Especie",
+       x = "Largo sepálico",
+       y = "Ancho sepálico") +
+  theme_minimal()
+dispersion_sepalo <- ggplotly(p_scatter_sepal)
+dispersion_sepalo
+
+# Gráfico de dispersión para Largo y Ancho de Pétalo
+p_scatter_petal <- ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
+  geom_point() +
+  scale_color_manual(values = colors) +
+  labs(title = "Gráfico de Dispersión de Largo y Ancho de Pétalo por Especie",
+       x = "Longitud de Pétalo",
+       y = "Ancho de Pétalo") +
+  theme_minimal()
+dispersion_petalo <- ggplotly(p_scatter_petal)
+dispersion_petalo
+``

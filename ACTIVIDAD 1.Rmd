@@ -1,0 +1,104 @@
+---
+title: "sanchezcollao_actividad14//15"
+author: "JAVI"
+date: "2024-06-12"
+output: html_document
+---
+
+***
+
+# <span style = "color: orange">**Responde las siguientes preguntas:** </span>
+
+## <span style = "color: orange">**Pregunta Nro 1 Si la distribución de datos es asimétrica, ¿qué estadísticos emplearías?:** </span>
+
+**Respuesta 1:**  
+Distribuciones asimétricas:  
+Al enfrentarnos a distribuciones asimétricas, como es común en datos biológicos, la **mediana**, **moda** y el **rango intercuartílico (IQR)** se convierten en herramientas valiosas. La **mediana**, al no verse afectada por valores atípicos (outliers), ofrece una medida robusta de la tendencia central, la **moda** es el valor que aparece con más frecuencia en un conjunto de datos. En una distribución asimétrica, la moda será diferente a la media y la mediana, mientras que el **IQR** proporciona una estimación de la dispersión menos sensible a estos valores extremos.
+
+## <span style = "color: orange">**Pregunta Nro 2 Cuando los datos presentan potenciales "outliers", ¿qué estadístico(s) emplearías?:** </span>
+
+**Respuesta 2:**  
+La presencia de outliers en datos bioestadísticos puede ser un desafío. En este contexto, la **mediana** y el **IQR** nuevamente se posicionan como alternativas confiables. La **mediana**, como se mencionó anteriormente, no se ve afectada por outliers, por lo que brinda una medida de tendencia central más representativa de la distribución real de los datos. El **IQR**, al excluir los valores extremos, proporciona una estimación de la dispersión que refleja mejor la variabilidad de la mayoría de los datos.
+
+## <span style = "color: orange">**Pregunta Nro 3 Un boxplot, ¿permite identificar rápidamente la desviación estándar? ¿por qué?:** </span>
+
+**Respuesta 3:**  
+Si bien un boxplot es una herramienta gráfica útil para visualizar la distribución de los datos, **no proporciona directamente la desviación estándar**. El boxplot muestra la mediana, los cuartiles y los outliers, permitiendo una evaluación visual de la dispersión de los datos. Sin embargo, para **obtener la desviación estándar como medida numérica de la dispersión, se deben utilizar otras herramientas estadísticas como la función `sd()` en R**.
+
+## <span style = "color: orange">**Pregunta Nro 4 Con qué otros nombres podemos referirnos a las variables cualitativas?:** </span>
+
+**Respuesta 4:**  
+En el campo de la bioestadística, las variables cualitativas se conocen comúnmente por diversos términos:  
+- **Variables categóricas**: Clasifican a los individuos en grupos o categorías no numéricas.
+- **Variables nominales**: Las categorías no poseen un orden natural. Ejemplo: tipo de sangre (A, B, AB, O).
+- **Variables de atributo/ordinales**: Describen características o cualidades de los individuos. Ejemplo: color de ojos (azul, verde, marrón).
+
+## <span style = "color: orange">**Pregunta Nro 4 Con qué otros nombres podemos referirnos a las variables cualitativas?:** </span>   
+
+```{r}
+library(agricolae)
+library(carData)
+library(ggplot2)
+library(gridExtra)
+library(kableExtra)
+library(plotly)
+library(tidyverse)
+
+# Análisis de datos Davis
+data("Davis")
+
+data <- Davis
+attach(data)
+
+data %>% 
+  head(5) %>% 
+  kable() %>%
+  kable_styling("striped", full_width = FALSE, position = "center", font_size = 16) %>%
+  row_spec(0, monospace = TRUE, bold = TRUE, color = "orange") %>%
+  row_spec(1:ncol(data), color = "white", background = "#808080")
+
+# Calcular los estadísticos descriptivos
+data$weight <- as.numeric(data$weight)
+data$height <- as.numeric(data$height)
+data$repwt <- as.numeric(data$repwt)
+data$repht <- as.numeric(data$repht)
+
+# Selecciona las columnas que son numéricas
+variables_numericas_df <- data %>%
+  select(where(is.numeric))
+
+# Crea un dataframe con nombres de columnas pero sin datos para almacenar resultados
+df_estadisticos_numericos <- data.frame(Variable = character(),
+                                        Media = numeric(),
+                                        Mediana = numeric(),
+                                        IQR = numeric())
+
+# Para cada columna que es numérica
+for (i in names(variables_numericas_df)) {
+  media <- round(mean(variables_numericas_df[[i]], na.rm = TRUE), 2)
+  mediana <- round(median(variables_numericas_df[[i]], na.rm = TRUE), 2)
+  IQR <- round(IQR(variables_numericas_df[[i]], na.rm = TRUE), 2)
+
+  df_tem <- data.frame(Variable = i, Media = media, Mediana = mediana, IQR = IQR)
+  df_estadisticos_numericos <- rbind(df_estadisticos_numericos, df_tem)
+}
+
+df_estadisticos_numericos
+
+# Selecciona las columnas que son factores
+variables_factor_df <- data %>%
+  select(where(is.factor))
+
+# Crea un dataframe vacío para almacenar los resultados
+df_estadisticos_factor <- data.frame()
+
+# Para cada columna que es un factor
+for (i in names(variables_factor_df)) {
+  niveles <- levels(variables_factor_df[[i]])
+  frecuencias <- table(variables_factor_df[[i]])
+
+  df_temp <- data.frame(Variable = i, Nivel = niveles, Frecuencias = as.numeric(frecuencias))
+  df_estadisticos_factor <- rbind(df_estadisticos_factor, df_temp)
+}
+
+df_estadisticos_factor
